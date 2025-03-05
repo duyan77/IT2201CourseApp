@@ -1,3 +1,6 @@
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from courses.models import Category, Course, Lesson
 from courses import serializers, paginators
 from rest_framework import viewsets, generics
@@ -23,3 +26,9 @@ class CourseViewSet(viewsets.ViewSet, generics.ListAPIView):
         if cate_id:
             query = query.filter(category_id=cate_id)
         return query
+
+    @action(methods=['get'], url_path='lessons', detail=True)
+    def get_lessons(self, request, pk):
+        lessons = self.get_object().lesson_set.filter(active=True)
+        return Response(serializers.LessonSerializer(lessons, many=True).data)
+
